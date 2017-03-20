@@ -46,10 +46,16 @@ public abstract class Person implements java.io.Serializable {
 		return DOB;
 	}
 
-	public void setDOB(Date DOB){
-		this.DOB = DOB;
+	public void setDOB(Date DOB) throws PersonException{
 		
-		
+			this.DOB = DOB;
+			if (this.PrintAge() < 100)
+				this.DOB = DOB;
+			else {
+				
+				throw new PersonException(this);
+			}
+
 	}
 
 	public void setAddress(String newAddress) {
@@ -60,7 +66,15 @@ public abstract class Person implements java.io.Serializable {
 		return address;
 	}
 
-	public void setPhone(String newPhone_number) {
+	public void setPhone(String newPhone_number) throws PersonException {
+		String regex = "\\(([0-9]{3})\\)-([0-9]{3})-([0-9]{4})$";
+		 
+		Pattern pattern = Pattern.compile(regex);
+	
+		Matcher matcher = pattern.matcher(newPhone_number);
+		if (!matcher.matches())
+			throw new PersonException(this);
+		
 		phone_number = newPhone_number;
 	
 	}
@@ -88,15 +102,24 @@ public abstract class Person implements java.io.Serializable {
 	 * Constructors Constructor with arguments
 	 */
 
-	public Person(String FirstName, String MiddleName, String LastName,
+	public Person (String FirstName, String MiddleName, String LastName,
 			Date DOB, String Address, String Phone_number, String Email)
 	{
 		this.FirstName = FirstName;
 		this.MiddleName = MiddleName;
 		this.LastName = LastName;
-		this.setDOB(DOB);
+		
+		try {
+			this.setDOB(DOB);
+		} catch (PersonException p) {
+			System.out.println("Age cannot be greater than 100");
+		}
 		this.address = Address;
-		this.setPhone(Phone_number);
+		try {
+			this.setPhone(Phone_number);
+		} catch (PersonException e) {
+			System.out.println("Phone number must be formatted (###)-###-####");
+		}
 		this.email_address = Email;
 		
 	}
